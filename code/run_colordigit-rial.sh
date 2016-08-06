@@ -1,0 +1,22 @@
+#!/bin/bash
+th comm.lua \
+-bs 32 \
+-game ColorDigit \
+-game_level extra_hard_local \
+-game_nagents 2 \
+-game_action_space 2 \
+-game_comm_limited 0 \
+-game_comm_bits 1 \
+-game_comm_sigma 2 \
+-nsteps 2 \
+-gamma 1 \
+-model_dial 0 \
+-model_know_share 1 \
+-model_action_aware 1 \
+-model_rnn_size 128 \
+-learningrate 0.0005 \
+-nepisodes 20000 \
+-step 100 \
+-step_test 10 \
+-step_target 100 \
+-cuda 0
