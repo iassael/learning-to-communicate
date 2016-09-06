@@ -19,7 +19,7 @@ return function(opt)
     function exp.optim(iter)
         -- iter can be used for learning rate decay
         -- local optimfunc = optim.adam
-        local optimfunc = optim.rmsprop
+        local optimfunc = optim.rmspropm
         local optimconfig = { learningRate = opt.learningrate }
         return optimfunc, optimconfig
     end
