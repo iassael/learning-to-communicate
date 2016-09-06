@@ -1,36 +1,59 @@
--- RMSProp with momentum as found in "Generating Sequences With Recurrent Neural Networks"
-function optim.rmspropm(opfunc, x, config, state)
-    -- Get state
-    local config = config or {}
-    local state = state or config
-    local lr = config.learningRate or 1e-2
-    local momentum = config.momentum or 0.95
-    local epsilon = config.epsilon or 0.01
+--[[ An implementation of RMSprop
 
-    -- Evaluate f(x) and df/dx
-    local fx, dfdx = opfunc(x)
+ARGS:
 
-    -- Initialise storage
-    if not state.g then
-        state.g = torch.Tensor():typeAs(x):resizeAs(dfdx):zero()
-        state.gSq = torch.Tensor():typeAs(x):resizeAs(dfdx):zero()
-        state.tmp = torch.Tensor():typeAs(x):resizeAs(dfdx)
-    end
+- 'opfunc' : a function that takes a single input (X), the point
+             of a evaluation, and returns f(X) and df/dX
+- 'x'      : the initial point
+- 'config` : a table with configuration parameters for the optimizer
+- 'config.learningRate'      : learning rate
+- 'config.alpha'             : smoothing constant
+- 'config.epsilon'           : value with which to initialise m
+- 'config.weightDecay'       : weight decay
+- 'state'                    : a table describing the state of the optimizer;
+                               after each call the state is modified
+- 'state.m'                  : leaky sum of squares of parameter gradients,
+- 'state.tmp'                : and the square root (with epsilon smoothing)
 
-    -- g = αg + (1 - α)df/dx
-    state.g:mul(momentum):add(1 - momentum, dfdx) -- Calculate momentum
-    -- tmp = df/dx . df/dx
-    state.tmp:cmul(dfdx, dfdx)
-    -- gSq = αgSq + (1 - α)df/dx
-    state.gSq:mul(momentum):add(1 - momentum, state.tmp) -- Calculate "squared" momentum
-    -- tmp = g . g
-    state.tmp:cmul(state.g, state.g)
-    -- tmp = (-tmp + gSq + ε)^0.5
-    state.tmp:neg():add(state.gSq):add(epsilon):sqrt()
+RETURN:
+- `x`     : the new x vector
+- `f(x)`  : the function, evaluated before the update
 
-    -- Update x = x - lr x df/dx / tmp
-    x:addcdiv(-lr, dfdx, state.tmp)
+]]
 
-    -- Return x*, f(x) before optimisation
-    return x, { fx }
+function optim.rmsprop(opfunc, x, config, state)
+   -- (0) get/update state
+   local config = config or {}
+   local state = state or config
+   local lr = config.learningRate or 1e-2
+   local alpha = config.alpha or 0.99
+   local epsilon = config.epsilon or 1e-8
+   local wd = config.weightDecay or 0
+
+   -- (1) evaluate f(x) and df/dx
+   local fx, dfdx = opfunc(x)
+
+   -- (2) weight decay
+   if wd ~= 0 then
+      dfdx:add(wd, x)
+   end
+
+   -- (3) initialize mean square values and square gradient storage
+   if not state.m then
+      -- This line kills the performance
+      -- state.m = torch.Tensor():typeAs(x):resizeAs(dfdx):fill(1)
+      state.m = torch.Tensor():typeAs(x):resizeAs(dfdx):zero()
+      state.tmp = torch.Tensor():typeAs(x):resizeAs(dfdx)
+   end
+
+   -- (4) calculate new (leaky) mean squared values
+   state.m:mul(alpha)
+   state.m:addcmul(1.0-alpha, dfdx, dfdx)
+
+   -- (5) perform update
+   state.tmp:sqrt(state.m):add(epsilon)
+   x:addcdiv(-lr, dfdx, state.tmp)
+
+   -- return x*, f(x) before optimization
+   return x, {fx}
 end
