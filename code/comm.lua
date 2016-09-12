@@ -67,7 +67,6 @@ cmd:option('-game_nagents', 2, '')
 cmd:option('-game_action_space', 2, '')
 cmd:option('-game_comm_limited', 0, '')
 cmd:option('-game_comm_bits', 1, '')
-cmd:option('-game_comm_discrete', 0, '')
 cmd:option('-game_comm_sigma', 0, '')
 cmd:option('-game_coop', 1, '')
 cmd:option('-game_bottleneck', 10, '')
@@ -80,7 +79,6 @@ cmd:option('-game_nagents', 3, '')
 cmd:option('-game_action_space', 2, '')
 cmd:option('-game_comm_limited', 1, '')
 cmd:option('-game_comm_bits', 2, '')
-cmd:option('-game_comm_discrete', 0, '')
 cmd:option('-game_comm_sigma', 0, '')
 cmd:option('-nsteps', 6, 'number of steps')
 
@@ -323,7 +321,7 @@ local function run_episode(opt, game, model, agent, test_mode)
 
             -- If dial split out the comm values from q values
             if opt.model_dial == 1 then
-                q_t, comm = split_comm(q_t, test_mode)
+                q_t, comm = DRU(q_t, test_mode)
             end
 
             -- Pick an action (epsilon-greedy)
@@ -506,7 +504,7 @@ local function run_episode(opt, game, model, agent, test_mode)
                 local state, q_t_target = unpack(model.agent_target[model.id(step, i)]:forward(agent[i].input_target[step]))
                 agent[i].state_target[step] = state
                 if opt.model_dial == 1 then
-                    q_t_target, comm = split_comm(q_t_target, test_mode)
+                    q_t_target, comm = DRU(q_t_target, test_mode)
                 end
 
                 -- Limit actions
@@ -571,13 +569,13 @@ end
 
 
 -- split out the communication bits and add noise.
-function split_comm(q_t, test_mode)
-    if opt.model_dial == 0 then error('warning!! Should only be used in dial') end
+function DRU(q_t, test_mode)
+    if opt.model_dial == 0 then error('Warning!! Should only be used in DIAL') end
     local bound = opt.game_action_space
 
     local q_t_n = q_t[{ {}, { 1, bound } }]:clone()
     local comm = q_t[{ {}, { bound + 1, opt.game_action_space_total } }]:clone()
-    if test_mode and opt.game_comm_continuous == 0 then
+    if test_mode then
         if opt.model_comm_narrow == 0 then
             local ind
             _, ind = torch.max(comm, 2)
