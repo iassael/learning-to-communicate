@@ -19,8 +19,7 @@ function Switch:__init(opt)
         { 'game_action_space', type = 'int-pos', default = 2 },
         { 'game_reward_shift', type = 'int', default = 0 },
         { 'game_comm_bits', type = 'int', default = 0 },
-        { 'game_comm_discrete', type = 'int', default = 0 },
-        { 'game_comm_sigma', type = 'number', default = 3 },
+        { 'game_comm_sigma', type = 'number', default = 2 },
     })
 
     -- Steps max override
