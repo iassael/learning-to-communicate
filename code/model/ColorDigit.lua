@@ -266,9 +266,10 @@ return function(opt)
             local model_comm = nn.Sequential()
             model_comm:add(nn.View(-1, comm_size))
             if opt.model_dial == 1 then
-                if opt.model_comm_narrow == 0 then
+                if opt.model_comm_narrow == 1 then
+                    model_comm:add(nn.Sigmoid())
+                else
                     model_comm:add(nn.SoftMax())
-                    model_comm:add(nn.GaussianNoise(opt.game_comm_sigma_post))
                 end
             end
             if opt.model_bn == 1 and opt.model_dial == 1 then

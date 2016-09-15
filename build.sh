@@ -1,1 +1,1 @@
-docker nvidia-build -t $USER/comm .
+nvidia-docker build -t $USER/comm .

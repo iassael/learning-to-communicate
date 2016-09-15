@@ -1,33 +1,26 @@
-FROM nvidia/cuda:7.5-cudnn5-devel-ubuntu14.04
-# FROM ubuntu:14.04
+FROM nvidia/cuda:8.0-cudnn5-devel-ubuntu16.04
+# FROM ubuntu:16.04
 MAINTAINER Yannis Assael, Jakob Foerster
 
 # CUDA includes
-ENV CUDA_TOOLKIT_ROOT_DIR /usr/local/cuda
-ENV CPPFLAGS "-I/usr/local/cuda/include $CPPFLAGS"
-ENV CFLAGS "-I/usr/local/cuda/include $CFLAGS"
-ENV CMAKE_INCLUDE_PATH /usr/local/cuda/include:$CMAKE_INCLUDE_PATH
+ENV CUDA_PATH /usr/local/cuda
+ENV CUDA_INCLUDE_PATH /usr/local/cuda/include
+ENV CUDA_LIBRARY_PATH /usr/local/cuda/lib64
 
 # Ubuntu Packages
 RUN apt-get update -y && apt-get install software-properties-common -y && \
     add-apt-repository -y multiverse && apt-get update -y && apt-get upgrade -y && \
-    apt-get install -y nano vim man build-essential
+    apt-get install -y apt-utils nano vim man build-essential wget sudo && \
+    rm -rf /var/lib/apt/lists/*
 
-# Install curl and dependencies for torch
-RUN apt-get install -y curl libssl-dev openssl libopenblas-dev \
-    libhdf5-dev hdf5-helpers hdf5-tools libhdf5-serial-dev libprotobuf-dev protobuf-compiler nano
+# Install curl and other dependencies
+RUN apt-get update -y && apt-get install -y curl libssl-dev openssl libopenblas-dev \
+    libhdf5-dev hdf5-helpers hdf5-tools libhdf5-serial-dev libprotobuf-dev protobuf-compiler && \
+    curl -sk https://raw.githubusercontent.com/torch/distro/master/install-deps | bash && \
+    rm -rf /var/lib/apt/lists/*
 
 # Clone torch (and package) repos:
-RUN curl -sk https://raw.githubusercontent.com/torch/ezinstall/master/install-deps | bash && \
-    mkdir -p /opt && git clone https://github.com/torch/distro.git /opt/torch --recursive
-
-# Patch: generate code for 750 Ti (sm_50), Titan Black / 780 Ti (sm_35), Titan X (sm_52), and ONLY these:
-# This makes sure we generate GPU-specific code to prevent the 60-second JIT compile for new containers.
-# RUN cd /opt/torch && \
-#     sed -i 's/"-arch=sm_20"/"-gencode arch=compute_50,code=sm_50 -gencode arch=compute_35,code=sm_35 -gencode arch=compute_52,code=sm_52"/' \
-#         extra/cutorch/lib/THC/CMakeLists.txt \
-#         extra/cunn/CMakeLists.txt \
-#         extra/cunnx/CMakeLists.txt
+RUN mkdir -p /opt && git clone https://github.com/torch/distro.git /opt/torch --recursive
 
 # Run installation script
 RUN cd /opt/torch && ./install.sh -b
@@ -55,7 +48,6 @@ RUN luarocks install totem && \
     luarocks install https://raw.githubusercontent.com/deepmind/torch-distributions/master/distributions-0-0.rockspec
 
 # Cleanup
-RUN rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
-    rm -rf /tmp/var/*
+RUN rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 WORKDIR /project

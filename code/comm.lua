@@ -255,7 +255,7 @@ local function run_episode(opt, game, model, agent, test_mode)
         -- Iterate agents
         for i = 1, opt.game_nagents do
             agent[i].input[step] = {
-                episode[step].s_t[i],
+                episode[step].s_t[i]:type(opt.dtype),
                 agent[i].id,
                 agent[i].state[step - 1]
             }
@@ -263,7 +263,7 @@ local function run_episode(opt, game, model, agent, test_mode)
             -- Communication enabled
             if opt.game_comm_bits > 0 and opt.game_nagents > 1 then
                 local comm_limited = game:getCommLimited(step, i)
-                local comm = episode[step].comm:clone()
+                local comm = episode[step].comm:clone():type(opt.dtype)
                 if comm_limited then
                     -- Create limited communication channel nbits
                     local comm_lim = torch.zeros(opt.bs, 1, opt.game_comm_bits):type(opt.dtype)
@@ -286,7 +286,7 @@ local function run_episode(opt, game, model, agent, test_mode)
             if opt.model_action_aware == 1 then
                 -- If comm always then use both action
                 if opt.model_dial == 0 then
-                    local la = { torch.ones(opt.bs), torch.ones(opt.bs) }
+                    local la = { torch.ones(opt.bs):type(opt.dtype), torch.ones(opt.bs):type(opt.dtype) }
                     if step > 1 then
                         for b = 1, opt.bs do
                             -- Last action
@@ -302,7 +302,7 @@ local function run_episode(opt, game, model, agent, test_mode)
                     table.insert(agent[i].input[step], la)
                 else
                     -- Action aware for single a, comm action
-                    local la = torch.ones(opt.bs)
+                    local la = torch.ones(opt.bs):type(opt.dtype)
                     if step > 1 then
                         for b = 1, opt.bs do
                             if episode[step - 1].a_t[b][i] > 0 then
@@ -372,9 +372,9 @@ local function run_episode(opt, game, model, agent, test_mode)
             end
 
             -- Store actions
-            episode[step].a_t[{ {}, { i } }] = max_a
+            episode[step].a_t[{ {}, { i } }] = max_a:type(opt.dtype)
             if opt.model_dial == 0 and opt.game_comm_bits > 0 then
-                episode[step].a_comm_t[{ {}, { i } }] = max_a_comm
+                episode[step].a_comm_t[{ {}, { i } }] = max_a_comm:type(opt.dtype)
             end
 
             for b = 1, opt.bs do
@@ -473,11 +473,11 @@ local function run_episode(opt, game, model, agent, test_mode)
 
                 if opt.game_comm_bits > 0 and opt.game_nagents > 1 and opt.model_dial == 1 then
                     local comm_limited = game:getCommLimited(step, i)
-                    comm = episode[step].comm_target:clone()
+                    comm = episode[step].comm_target:clone():type(opt.dtype)
 
                     -- Create limited communication channel nbits
                     if comm_limited then
-                        local comm_lim = torch.zeros(opt.bs, 1, opt.game_comm_bits)
+                        local comm_lim = torch.zeros(opt.bs, 1, opt.game_comm_bits):type(opt.dtype)
                         for b = 1, opt.bs do
                             if comm_limited[b] == 0 then
                                 comm_lim[{ { b } }] = 0
@@ -511,8 +511,8 @@ local function run_episode(opt, game, model, agent, test_mode)
                 if opt.model_dial == 0 and opt.game_comm_bits > 0 then
                     local action_range, action_range_comm = game:getActionRange(step, i)
                     if action_range then
-                        agent[i].q_next_max[step] = torch.zeros(opt.bs)
-                        agent[i].q_comm_next_max[step] = torch.zeros(opt.bs)
+                        agent[i].q_next_max[step] = torch.zeros(opt.bs):type(opt.dtype)
+                        agent[i].q_comm_next_max[step] = torch.zeros(opt.bs):type(opt.dtype)
                         for b = 1, opt.bs do
                             if action_range[b][2][1] > 0 then
                                 agent[i].q_next_max[step][b], _ = torch.max(q_t_target[action_range[b]], 2)
@@ -534,7 +534,7 @@ local function run_episode(opt, game, model, agent, test_mode)
                 else
                     local action_range = game:getActionRange(step, i)
                     if action_range then
-                        agent[i].q_next_max[step] = torch.zeros(opt.bs)
+                        agent[i].q_next_max[step] = torch.zeros(opt.bs):type(opt.dtype)
                         for b = 1, opt.bs do
                             if action_range[b][2][1] > 0 then
                                 agent[i].q_next_max[step][b], _ = torch.max(q_t_target[action_range[b]], 2)

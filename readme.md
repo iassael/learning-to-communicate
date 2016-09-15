@@ -14,7 +14,7 @@ We consider the problem of multiple agents sensing and acting in environments wi
 ## Execution
 ```
 $ # Requirements: nvidia-docker
-$ # Build docker instance
+$ # Build docker instance (takes a while)
 $ ./build.sh
 $ # Run docker instance
 $ ./run.sh
