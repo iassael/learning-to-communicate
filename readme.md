@@ -27,13 +27,9 @@ $ ./run_switch_3-dial.sh
 ```
 
 ## Bibtex
-
-    @article{foerster2016learning,
-        title={Learning to Communicate with Deep Multi-Agent Reinforcement Learning},
-        author={Foerster, Jakob N and Assael, Yannis M and de Freitas, Nando and Whiteson, Shimon},
-        journal={arXiv preprint arXiv:1605.06676},
-        year={2016}
+    @inproceedings{foerster2016learning, title={Learning to communicate with deep multi-agent reinforcement learning}, author={Foerster, Jakob and Assael, Yannis M and de Freitas, Nando and Whiteson, Shimon}, booktitle={Advances in Neural Information Processing Systems}, pages={2137--2145}, year={2016} 
     }
+
 
 ## License
 
