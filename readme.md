@@ -11,7 +11,7 @@ We consider the problem of multiple agents sensing and acting in environments wi
 
 ## Links
 
-\- [Pytorch Implementation!!!!!!!!!!!!!!] (https://github.com/minqi/learning-to-communicate-pytorch)
+\- [Brand new Pytorch Implementation!!!!!!](https://github.com/minqi/learning-to-communicate-pytorch)
 
 \- [arXiv pre-print](https://arxiv.org/abs/1605.06676)
 
