@@ -3,6 +3,12 @@
 
 Jakob N. Foerster, Yannis M. Assael, Nando de Freitas, Shimon Whiteson
 
+## PyTorch
+
+\- [PyTorch Implementation by @minqi](https://github.com/minqi/learning-to-communicate-pytorch)
+
+## Abstract
+
 <p align="center">
 <img alt="Learning to Communicate" src="http://blog.yannisassael.com/wp-content/uploads/2016/09/switch_vis_768.jpg" />
 </p>
@@ -11,9 +17,7 @@ We consider the problem of multiple agents sensing and acting in environments wi
 
 ## Links
 
-\- [Brand new Pytorch Implementation!!!!!!](https://github.com/minqi/learning-to-communicate-pytorch)
-
-\- [arXiv pre-print](https://arxiv.org/abs/1605.06676)
+\- [PDF](https://papers.nips.cc/paper/6042-learning-to-communicate-with-deep-multi-agent-reinforcement-learning)
 
 \- [Montreal Deep Learning Summer School 2016 talk](http://videolectures.net/deeplearning2016_foerster_learning_communicate/)
 
