@@ -6,6 +6,7 @@ Jakob N. Foerster, Yannis M. Assael, Nando de Freitas, Shimon Whiteson
 ## PyTorch
 
 \- [PyTorch Implementation by @minqi](https://github.com/minqi/learning-to-communicate-pytorch)
+
 \- [Simplified PyTorch implementation in a colab by @JainMoksh](https://colab.research.google.com/gist/MJ10/2c0d1972f3dd1edcc3cd17c636aac8d2/dial.ipynb)
 
 ## Abstract
